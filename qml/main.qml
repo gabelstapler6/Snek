@@ -15,26 +15,43 @@ Window {
     minimumWidth: size
 
     visible: true
-    title: qsTr("Hello World")
+    title: qsTr("Snek")
     color: "black"
 
     property var head: snek
     property var food: null
+    property var snake: [snek]
+
 
     Button {
-        id: startButton
-        
-        anchors.left: parent.left
-        anchors.top: parent.top
+        id: button
+        z:1
+        anchors.centerIn: parent
         
         height: 35
         width: 75
 
-        text: "start"
+        text: isStart ? "start" : "restart"
+        
+        property bool isStart: true
+        
 
         onClicked: {
+            if(!isStart){
+                for(let i = 1; i < snake.length; i++){
+                    snake[i].destroy()
+                }
+                snake = []
+                snake.push(snek)
+                snek.rect.color = "white"
+                snek.model.setNext(null)
+                snek.x = 90
+                snek.y = 90
+            }
+            snek.visible = true
             moveTimer.running = true
             visible = false
+            isStart = false
             keyboardInput.focus = true
             spawnFood()
         }
@@ -45,7 +62,8 @@ Window {
         id: snek
         x: 90
         y: 90
-        
+        visible: false
+
         onXChanged: {
             checkCollision()
         }
@@ -54,20 +72,34 @@ Window {
         }
 
         function checkCollision(){
-            if(model.isCollision(x, y)){
-                gameOver()
+            
+            var next = model.getNext()
+            if(next != null){
+                if(next.isCollision(x, y)){
+                    gameOver()
+                }
             }
 
-            if(x == food.x && y == food.y){
-                // eat()
+            if(x == food.x/2 && y == food.y/2){
+                eat()
             }
         }
+
+        function eat() {
+            let comp = Qt.createComponent("SnakeBody.qml")
+            var newTail = comp.createObject(root)
+            model.eat(newTail.model)
+            spawnFood()
+
+            snake.push(newTail)
+        }
+
     }
 
     Timer {
         id: moveTimer
         repeat: true
-        interval: 1000
+        interval: 250
         
         onTriggered: {
             head.move()
@@ -80,49 +112,46 @@ Window {
         
         Keys.onRightPressed: {
             head.direction = "RIGHT"
-            console.log(head.direction)
         }
 
         Keys.onLeftPressed: {
             head.direction = "LEFT"
-            console.log(head.direction)
-
         }
 
         Keys.onUpPressed: {
             head.direction = "UP"
-            console.log(head.direction)
-
         }
 
         Keys.onDownPressed: {
             head.direction = "DOWN"
-            console.log(head.direction)
-
         }
     }
 
 
     function spawnFood(){
-        let xPos = getRandomInt(0, 190)
+        let xPos = getRandomInt(0, 380)
         while(xPos % 20 != 0){
-            xPos = getRandomInt(0, 190)
+            xPos = getRandomInt(0, 380)
         }
-        let yPos = getRandomInt(0, 190)
+        let yPos = getRandomInt(0, 380)
         while(yPos % 20 != 0){
-            yPos = getRandomInt(0, 190)
+            yPos = getRandomInt(0, 380)
         }
-        
-        let comp = Qt.createComponent("Food.qml")
-        food = comp.createObject(root, {x: xPos, y: yPos})
+        if(food == null){
+            let comp = Qt.createComponent("Food.qml")
+            food = comp.createObject(root, {x: xPos, y: yPos})
+        } else {
+            food.x = xPos
+            food.y = yPos
+        }
     }
     
     function gameOver() {
-        
-        console.log("game over")
-
+        for(let i = 0; i < snake.length; i++){
+            snake[i].rect.color = "red"
+        }
         moveTimer.running = false
-        
+        button.visible = true
     }
 
     function getRandomInt(min, max) {

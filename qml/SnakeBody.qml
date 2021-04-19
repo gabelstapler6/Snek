@@ -11,6 +11,7 @@ Item {
     property int size: 20
 
     property alias model: model
+    property alias rect: rect
 
     Rectangle {
         id: rect
@@ -32,7 +33,6 @@ Item {
             let pos = model.getPosition()
             x = pos.x
             y = pos.y
-            print("x: " + x + " y: " + y)
             
             if(y < 0 || y >= root.height/2 || x < 0 || x >= root.width/2){
                 root.gameOver()

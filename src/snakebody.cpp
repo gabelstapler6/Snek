@@ -10,11 +10,13 @@ SnakeBody::~SnakeBody()
 {
 }
 
-void SnakeBody::setNext(SnakeBody* next){
+void SnakeBody::setNext(SnakeBody* next)
+{
     this->next = next;
 }
 
-SnakeBody* SnakeBody::getNext(){
+SnakeBody* SnakeBody::getNext()
+{
     return next;
 }
 
@@ -27,8 +29,19 @@ void SnakeBody::move(int x, int y)
         next->move(oldPos.x(), oldPos.y());
 }
 
-bool SnakeBody::isCollision(int x, int y){
-    if(position.x == x && position.y == y){
+void SnakeBody::eat(SnakeBody* newTail)
+{
+    if(next == nullptr){
+        next = newTail;
+        newTail->setPosition(position);
+    } else {
+        next->eat(newTail);
+    }
+}
+
+bool SnakeBody::isCollision(int x, int y)
+{
+    if(position.x() == x && position.y() == y){
         return true;
     } else {
         if(next != nullptr){
@@ -39,11 +52,13 @@ bool SnakeBody::isCollision(int x, int y){
     }
 }
 
-void SnakeBody::setPosition(QPoint pos){
+void SnakeBody::setPosition(QPoint pos)
+{
     position = pos;
     emit positionChanged();
 }
 
-QPoint SnakeBody::getPosition(){
+QPoint SnakeBody::getPosition()
+{
     return position;
 }
