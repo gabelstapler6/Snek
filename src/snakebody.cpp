@@ -27,6 +27,18 @@ void SnakeBody::move(int x, int y)
         next->move(oldPos.x(), oldPos.y());
 }
 
+bool SnakeBody::isCollision(int x, int y){
+    if(position.x == x && position.y == y){
+        return true;
+    } else {
+        if(next != nullptr){
+            return next->isCollision(x, y);
+        } else {
+            return false;
+        }
+    }
+}
+
 void SnakeBody::setPosition(QPoint pos){
     position = pos;
     emit positionChanged();

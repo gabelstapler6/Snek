@@ -19,7 +19,7 @@ Window {
     color: "black"
 
     property var head: snek
-
+    property var food: null
 
     Button {
         id: startButton
@@ -47,10 +47,20 @@ Window {
         y: 90
         
         onXChanged: {
-            // check for collision with tail or food
+            checkCollision()
         }
         onYChanged: {
-            // check for collision with tail or food
+            checkCollision()
+        }
+
+        function checkCollision(){
+            if(model.isCollision(x, y)){
+                gameOver()
+            }
+
+            if(x == food.x && y == food.y){
+                // eat()
+            }
         }
     }
 
@@ -104,7 +114,7 @@ Window {
         }
         
         let comp = Qt.createComponent("Food.qml")
-        let object = comp.createObject(root, {x: xPos, y: yPos})
+        food = comp.createObject(root, {x: xPos, y: yPos})
     }
     
     function gameOver() {

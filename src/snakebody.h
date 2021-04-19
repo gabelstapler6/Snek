@@ -22,9 +22,10 @@ public:
     SnakeBody* getNext();
 
     Q_INVOKABLE void move(int x, int y);
+    Q_INVOKABLE bool isCollision(int x, int y);
 
     void setPosition(QPoint pos);
-    Q_INVOKABLE QPoint getPosition();
+    QPoint getPosition();
 
 signals:
     void positionChanged();
