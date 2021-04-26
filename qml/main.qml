@@ -1,12 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
+import QtGraphicalEffects 1.15
 
 Window {
     id: root
-
-    property int size: 400
-
+    property var size: 500
     width: size
     height: size
     maximumHeight: size
@@ -14,148 +13,131 @@ Window {
     minimumHeight: size
     minimumWidth: size
 
+    flags: Qt.FramelessWindowHint
+
     visible: true
-    title: qsTr("Snek")
-    color: "black"
+    color: "transparent"
 
-    property var head: snek
-    property var food: null
-    property var snake: [snek]
-
-
-    Button {
-        id: button
-        z:1
-        anchors.centerIn: parent
-        
-        height: 35
-        width: 75
-
-        text: isStart ? "start" : "restart"
-        
-        property bool isStart: true
-        
-
-        onClicked: {
-            if(!isStart){
-                for(let i = 1; i < snake.length; i++){
-                    snake[i].destroy()
-                }
-                snake = []
-                snake.push(snek)
-                snek.rect.color = "white"
-                snek.model.setNext(null)
-                snek.x = 90
-                snek.y = 90
-            }
-            snek.visible = true
-            moveTimer.running = true
-            visible = false
-            isStart = false
-            keyboardInput.focus = true
-            spawnFood()
-        }
-        
+    MouseArea {
+        anchors.fill: parent
+        onClicked: menu.state = 'closed'
     }
 
-    SnakeBody {
-        id: snek
-        x: 90
-        y: 90
-        visible: false
-
-        onXChanged: {
-            checkCollision()
-        }
-        onYChanged: {
-            checkCollision()
-        }
-
-        function checkCollision(){
-            
-            var next = model.getNext()
-            if(next != null){
-                if(next.isCollision(x, y)){
-                    gameOver()
-                }
-            }
-
-            if(x == food.x/2 && y == food.y/2){
-                eat()
-            }
-        }
-
-        function eat() {
-            let comp = Qt.createComponent("SnakeBody.qml")
-            var newTail = comp.createObject(root)
-            model.eat(newTail.model)
-            spawnFood()
-
-            snake.push(newTail)
-        }
-
+    
+    DropShadow {
+        id: shadow
+        anchors.fill: bg
+        color: "black"
+        samples: 16
+        radius: 12
+        source: bg
     }
 
-    Timer {
-        id: moveTimer
-        repeat: true
-        interval: 250
-        
-        onTriggered: {
-            head.move()
-        }
-    }
-        
-    Item {
-        id: keyboardInput
-        focus: true
-        
-        Keys.onRightPressed: {
-            head.direction = "RIGHT"
-        }
-
-        Keys.onLeftPressed: {
-            head.direction = "LEFT"
-        }
-
-        Keys.onUpPressed: {
-            head.direction = "UP"
-        }
-
-        Keys.onDownPressed: {
-            head.direction = "DOWN"
-        }
-    }
-
-
-    function spawnFood(){
-        let xPos = getRandomInt(0, 380)
-        while(xPos % 20 != 0){
-            xPos = getRandomInt(0, 380)
-        }
-        let yPos = getRandomInt(0, 380)
-        while(yPos % 20 != 0){
-            yPos = getRandomInt(0, 380)
-        }
-        if(food == null){
-            let comp = Qt.createComponent("Food.qml")
-            food = comp.createObject(root, {x: xPos, y: yPos})
-        } else {
-            food.x = xPos
-            food.y = yPos
-        }
+    DragHandler {
+        target: topBar
     }
     
-    function gameOver() {
-        for(let i = 0; i < snake.length; i++){
-            snake[i].rect.color = "red"
+    
+    Rectangle {
+        id: bg
+        anchors.fill: parent
+        anchors.margins: 6
+        
+        color: "gray"
+        
+        Rectangle {
+            id: topBar
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            height: 40
+
+            color: "lightgray"
+
+            Button {
+                id: closeButton
+                anchors.top: parent.top
+                anchors.right: parent.right
+                height: 40
+                width: 40
+                text: "X"
+                onClicked: {
+                    root.close()
+                }
+
+            }
+
+            Button {
+                id: minimizeButton
+                anchors.top: parent.top
+                anchors.right: closeButton.left
+                height: 40
+                width: 40
+                text: "_"
+            }
+
         }
-        moveTimer.running = false
-        button.visible = true
-    }
 
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * max) + min;
-    }
+        Snek {
+            id: snekGame
+            
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenterOffset: 20
+            anchors.verticalCenterOffset: 20
+        }
 
+        Rectangle {
+            id: menu
+            anchors.left: parent.left
+            anchors.top: topBar.bottom
+            anchors.bottom: parent.bottom
+            color: "darkgray"
+
+            state: 'closed'
+
+            states: [
+                State {
+                    name: 'opened'
+                    PropertyChanges {
+                        target: menu
+                        width: 240
+                    }
+                },
+
+                State {
+                    name: 'closed'
+                    PropertyChanges {
+                        target: menu
+                        width: 40
+                    }
+                }
+            ]
+
+            transitions: Transition {
+                PropertyAnimation {
+                    property: "width"
+                    easing.type: Easing.InOutQuad
+                }
+            }
+
+            Button {
+                id: menuButton
+                anchors.left: parent.left
+                anchors.top: parent.top2
+                height: 40
+                width: 40
+                text: "="
+
+                onClicked: {
+                    if (menu.state == 'closed') {
+                        menu.state = 'opened'
+                    } else {
+                        menu.state = 'closed'
+                    }
+                }
+            }
+        }
+    }
 }

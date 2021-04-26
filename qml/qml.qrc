@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>SnakeBody.qml</file>
         <file>Food.qml</file>
+        <file>Snek.qml</file>
     </qresource>
 </RCC>

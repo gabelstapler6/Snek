@@ -29,6 +29,21 @@ void SnakeBody::move(int x, int y)
         next->move(oldPos.x(), oldPos.y());
 }
 
+bool SnakeBody::moveAndCollide(int xNew, int yNew, int xColl, int yColl){
+    QPoint oldPos = position;
+    setPosition(QPoint(xNew, yNew));
+
+    if(oldPos.x() == xColl && oldPos.y() == yColl){
+        return true;
+    }
+    
+    if(next != nullptr){
+        return next->moveAndCollide(oldPos.x(), oldPos.y(), xColl, yColl);
+    } else {
+        return false;
+    }
+}
+
 void SnakeBody::eat(SnakeBody* newTail)
 {
     if(next == nullptr){

@@ -22,6 +22,7 @@ public:
     Q_INVOKABLE SnakeBody* getNext();
 
     Q_INVOKABLE void move(int x, int y);
+    Q_INVOKABLE bool moveAndCollide(int xNew, int yNew, int xColl, int yColl);
     Q_INVOKABLE void eat(SnakeBody* newTail);
     Q_INVOKABLE bool isCollision(int x, int y);
 

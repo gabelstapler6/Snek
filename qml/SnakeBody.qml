@@ -26,7 +26,6 @@ Item {
         id: model
     }
 
-    
     Connections {
         target: model
         function onPositionChanged() {
@@ -34,27 +33,35 @@ Item {
             x = pos.x
             y = pos.y
             
-            if(y < 0 || y >= root.height/2 || x < 0 || x >= root.width/2){
-                root.gameOver()
+            if(y < 0 || y >= snekRoot.height/2 || x < 0 || x >= snekRoot.width/2){
+                snekRoot.gameOver()
             }
         }
     }
 
     function move(){
+        let xNew, yNew
         switch(direction){
             case "UP":
-                model.move(x, y - size/2)
+                xNew = x
+                yNew = y - size / 2
                 break
             case "DOWN":
-                model.move(x, y + size/2)
+                xNew = x
+                yNew = y + size / 2
                 break
             case "LEFT":
-                model.move(x - size/2, y)
+                xNew = x - size / 2
+                yNew = y
                 break
             case "RIGHT":
-                model.move(x + size/2, y)
+                xNew = x + size / 2
+                yNew = y
                 break
         }
+
+        model.move(xNew, yNew)
+
     }
     
 }
