@@ -17,6 +17,7 @@ Rectangle {
     property var food: null
     property var snake: [snek]
 
+    signal startGame()
     
     MouseArea {
         anchors.fill: parent
@@ -42,6 +43,7 @@ Rectangle {
         
 
         onClicked: {
+            startGame()
             if(!isStart){
                 for(let i = 1; i < snake.length; i++){
                     snake[i].destroy()
@@ -104,7 +106,7 @@ Rectangle {
     Timer {
         id: moveTimer
         repeat: true
-        interval: 250
+        interval: 150
         
         onTriggered: {
             head.move()

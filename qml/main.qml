@@ -86,6 +86,15 @@ Window {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenterOffset: 20
             anchors.verticalCenterOffset: 20
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: menu.state = 'closed'
+            }
+
+            onStartGame: {
+                menu.state = 'closed'
+            }
         }
 
         Rectangle {
